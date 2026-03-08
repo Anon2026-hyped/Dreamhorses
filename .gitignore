@@ -8,6 +8,7 @@ yarn-error.log*
 dist/
 dist-ssr/
 *.local
+.next/
 
 # Environment variables
 .env
