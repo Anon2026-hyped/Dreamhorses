@@ -28,7 +28,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       {error && (
         <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded p-2">
           {error}
@@ -49,20 +49,23 @@ export default function LoginForm() {
       {/* Password field */}
       <FormField label="Password:" required htmlFor="password">
         <div className="flex flex-col gap-2">
-          <Input
+          <input
             id="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter password"
-            error={errors.password?.message}
+            className={`form-input ${errors.password?.message ? 'border-red-500' : ''}`}
             {...register('password')}
           />
+          {errors.password?.message && (
+            <p className="text-red-500 text-xs">{errors.password.message}</p>
+          )}
           <div className="flex items-center gap-1">
             <input
               type="checkbox"
               id="showPassword"
               checked={showPassword}
               onChange={(e) => setShowPassword(e.target.checked)}
-              className="w-3 h-3"
+              className="w-3 h-3 cursor-pointer"
             />
             <label htmlFor="showPassword" className="text-xs text-gray-600 whitespace-nowrap cursor-pointer">
               Show Password
@@ -87,12 +90,11 @@ export default function LoginForm() {
           type="submit"
           fullWidth
           disabled={isLoading}
-          onClick={handleSubmit(onSubmit)}
           className="text-base py-3"
         >
           {isLoading ? 'Signing In...' : 'Sign In'}
         </Button>
       </div>
-    </div>
+    </form>
   )
 }
