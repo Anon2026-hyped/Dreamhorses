@@ -14,14 +14,11 @@
   }
 
   .form-input {
-    @apply w-full border border-blue-400 rounded px-3 py-2 text-sm text-gray-700 
-           placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 
-           focus:border-blue-500 bg-white;
+    @apply w-full border border-blue-400 rounded px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white;
   }
 
   .btn-signin {
-    @apply w-full bg-dh-green hover:bg-dh-green-hover text-white font-semibold 
-           py-3 px-6 rounded text-base transition-colors cursor-pointer;
+    @apply w-full bg-dh-green hover:bg-dh-green-hover text-white font-semibold py-3 px-6 rounded text-base transition-colors cursor-pointer;
   }
 
   .dh-link {
@@ -29,7 +26,6 @@
   }
 
   .support-btn {
-    @apply border border-gray-300 rounded px-8 py-2 text-dh-link text-base 
-           hover:bg-gray-50 transition-colors;
+    @apply border border-gray-300 rounded px-8 py-2 text-dh-link text-base hover:bg-gray-50 transition-colors;
   }
 }

