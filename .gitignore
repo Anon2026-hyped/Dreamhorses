@@ -37,3 +37,6 @@ coverage/
 # OS
 .DS_Store
 Thumbs.db
+
+#Personal files
+SECURITY_CHANGES.md

